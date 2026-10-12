@@ -1,0 +1,293 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Android Messages Clone</title>
+    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
+    
+    <style>
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: 'Roboto', 'Malgun Gothic', sans-serif;
+        }
+
+        body {
+            background-color: #f0f0f0;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+        }
+
+        .phone-container {
+            width: 100%;
+            max-width: 400px;
+            height: 100vh;
+            max-height: 800px;
+            background-color: #ffffff;
+            display: flex;
+            flex-direction: column;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+            position: relative;
+        }
+
+        @media (min-width: 450px) {
+            .phone-container {
+                height: 85vh;
+                border-radius: 20px;
+                overflow: hidden;
+            }
+        }
+
+        /* 상단 앱바 */
+        .app-bar {
+            background-color: #ffffff;
+            color: #202124;
+            display: flex;
+            align-items: center;
+            padding: 12px 16px;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+            z-index: 10;
+        }
+
+        .app-bar .material-icons {
+            font-size: 24px;
+            cursor: pointer;
+            color: #5f6368;
+            padding: 8px;
+            border-radius: 50%;
+        }
+
+        .profile-info {
+            display: flex;
+            align-items: center;
+            flex-grow: 1;
+            margin-left: 8px;
+        }
+
+        .header-avatar {
+            width: 36px;
+            height: 36px;
+            background-color: #e0e0e0;
+            border-radius: 50%;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            margin-right: 12px;
+            color: #757575;
+        }
+
+        .contact-name {
+            font-size: 16px;
+            font-weight: 500;
+        }
+
+        /* 메시지 영역 */
+        .chat-area {
+            flex-grow: 1;
+            padding: 16px 12px;
+            overflow-y: auto;
+            display: flex;
+            flex-direction: column;
+            background-color: #ffffff;
+            gap: 4px;
+        }
+
+        .message-row {
+            display: flex;
+            align-items: flex-end;
+            margin-bottom: 4px;
+        }
+
+        .message-row.sent {
+            justify-content: flex-end;
+        }
+
+        .chat-avatar {
+            width: 32px;
+            height: 32px;
+            background-color: #e0e0e0;
+            border-radius: 50%;
+            margin-right: 8px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            color: #9e9e9e;
+            flex-shrink: 0;
+        }
+
+        /* 프로필 사진 숨김 처리 (연속 메시지용) */
+        .chat-avatar.hidden {
+            visibility: hidden;
+        }
+
+        .message {
+            max-width: 75%;
+            padding: 10px 14px;
+            font-size: 15px;
+            line-height: 1.4;
+            word-break: break-all;
+        }
+
+        /* 상대방 메시지 */
+        .message.received {
+            background-color: #f1f3f4;
+            color: #202124;
+            border-radius: 18px 18px 18px 4px;
+        }
+        
+        /* 연속된 상대방 메시지 모서리 둥글게 */
+        .message.received.middle {
+            border-radius: 18px 18px 18px 18px;
+        }
+
+        /* 내 메시지 (이미지 색상 반영) */
+        .message.sent {
+            background-color: #6a64f6; 
+            color: #ffffff;
+            border-radius: 18px 18px 4px 18px;
+        }
+        
+        /* 연속된 내 메시지 모서리 둥글게 */
+        .message.sent.top {
+            border-radius: 18px 18px 4px 18px;
+        }
+        .message.sent.middle {
+            border-radius: 18px 4px 4px 18px;
+        }
+        .message.sent.bottom {
+            border-radius: 18px 4px 18px 18px;
+        }
+
+        /* 여백 조정 */
+        .group-end {
+            margin-bottom: 16px;
+        }
+
+        /* 하단 입력 영역 */
+        .input-area {
+            display: flex;
+            align-items: center;
+            padding: 8px 16px;
+            background-color: #ffffff;
+            border-top: 1px solid #e0e0e0;
+        }
+
+        .input-area .material-icons {
+            color: #5f6368;
+            cursor: pointer;
+            padding: 8px;
+        }
+
+        .input-box {
+            flex-grow: 1;
+            background-color: #f1f3f4;
+            border-radius: 24px;
+            display: flex;
+            align-items: center;
+            padding: 4px 16px;
+            margin: 0 8px;
+        }
+
+        .input-box input {
+            width: 100%;
+            border: none;
+            background: transparent;
+            font-size: 15px;
+            padding: 10px 0;
+            outline: none;
+        }
+
+        .send-btn {
+            background-color: #6a64f6;
+            color: white;
+            border-radius: 50%;
+            width: 40px;
+            height: 40px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            cursor: pointer;
+        }
+    </style>
+</head>
+<body>
+
+    <div class="phone-container">
+        <!-- 상단 헤더 -->
+        <div class="app-bar">
+            <span class="material-icons">arrow_back</span>
+            <div class="profile-info">
+                <div class="header-avatar">
+                    <span class="material-icons">person</span>
+                </div>
+                <div class="contact-name">오다혜</div>
+            </div>
+            <span class="material-icons">videocam</span>
+            <span class="material-icons">call</span>
+        </div>
+
+        <!-- 메시지 내용 영역 -->
+        <div class="chat-area" id="chatArea">
+            
+            <!-- 상대방 1 -->
+            <div class="message-row group-end">
+                <div class="chat-avatar"><span class="material-icons">person</span></div>
+                <div class="message received">저 ??거?? 하는 법 아는지 좀 ㅈ ㅂ ㅠㅠ</div>
+            </div>
+
+            <!-- 나 1 -->
+            <div class="message-row sent group-end">
+                <div class="message sent">어 저건 코딩으로 만든거네 ㅋㅋㅋㅋㅋ</div>
+            </div>
+
+            <!-- 상대방 연속 메시지 -->
+            <div class="message-row">
+                <div class="chat-avatar hidden"><span class="material-icons">person</span></div>
+                <div class="message received middle">ㅋㅋㅋㅋㅋㅋ그치!!!</div>
+            </div>
+            <div class="message-row">
+                <div class="chat-avatar hidden"><span class="material-icons">person</span></div>
+                <div class="message received middle">그럴것 같았는데</div>
+            </div>
+            <div class="message-row">
+                <div class="chat-avatar hidden"><span class="material-icons">person</span></div>
+                <div class="message received middle">뭔 코딩임??</div>
+            </div>
+            <div class="message-row group-end">
+                <div class="chat-avatar"><span class="material-icons">person</span></div>
+                <div class="message received">뭔 바이브 코딩?</div>
+            </div>
+
+            <!-- 나 연속 메시지 -->
+            <div class="message-row sent">
+                <div class="message sent top">그냥 Html이랑</div>
+            </div>
+            <div class="message-row sent">
+                <div class="message sent middle">CSS로 하드코딩 해놓고</div>
+            </div>
+            <div class="message-row sent group-end">
+                <div class="message sent bottom">서버에서 불러오는것 같은데</div>
+            </div>
+
+        </div>
+
+        <!-- 하단 메시지 입력 영역 -->
+        <div class="input-area">
+            <span class="material-icons">add_circle_outline</span>
+            <span class="material-icons">photo</span>
+            <div class="input-box">
+                <input type="text" id="messageInput" placeholder="문자 메시지" autocomplete="off">
+            </div>
+            <div class="send-btn" id="sendBtn">
+                <span class="material-icons" style="color: white; margin-left: 4px;">send</span>
+            </div>
+        </div>
+    </div>
+
+</body>
+</html>
